@@ -44,4 +44,11 @@ function loadMultipleImages(fig)
     imshow(imread(imgPath), 'Parent', ax);
     lbl.Text = sprintf('%s | %s | %.1f KB', files{1}, getFileType(files{1}), getFileSize(imgPath));
     logMessage(fig, sprintf('Caricate %d immagini.', nAdded));
+
+    % placeholder
+    for k = 1:numel(newHistory)
+        [~, nn, ee] = fileparts(newHistory{k});
+        addHistoryRowSession(fig, [nn ee], upper(strrep(ee,'.','')), getFileSize(newHistory{k}), 'loaded', '');
+    end
+    writeFullLog(fig, sprintf('Caricate %d immagini.', nAdded));
 end

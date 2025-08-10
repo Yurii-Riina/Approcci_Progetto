@@ -99,7 +99,8 @@ function loadFeatureVector(fig, varargin)
     lbl.Text       = ['Risultato: ' char(gesture)];
 
     % → aggiorna Tab 4
-    addHistoryRowTab4(fig, sprintf('fv(%d)', numel(fv)), 'FV', '', '', gesture);
+    desc = sprintf('Vettore di feature – %d valori', numel(fv));
+    addHistoryRowSession(fig, desc, 'FV', '', '', gesture);
     writeFullLog(fig, sprintf('Feature vector (%s) → %s', char(mode), char(gesture)));
     setSessionStatus(fig, 'Classificazione vettore', true, []);
 

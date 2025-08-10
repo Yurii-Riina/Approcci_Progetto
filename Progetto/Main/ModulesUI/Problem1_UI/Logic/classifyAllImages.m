@@ -58,7 +58,7 @@ function classifyAllImages(fig)
                 gesture       = classifyGestureFromImage(imgPath); % string/char
 
                 % → TAB 4: aggiungi riga cronologia e log dettagliato
-                addHistoryRowTab4(fig, filename, 'IMG', getFileSize(imgPath), '', gesture);
+                addHistoryRowSession(fig, filename, upper(strrep(ext,'.','')), getFileSize(imgPath), 'batch', gesture);
                 writeFullLog(fig, sprintf('Batch: "%s" → %s', filename, char(gesture)));
 
                 % Scrivi riga CSV

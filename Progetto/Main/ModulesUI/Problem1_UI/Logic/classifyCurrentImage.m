@@ -25,7 +25,7 @@ function classifyCurrentImage(fig)
 
     % → aggiorna Tab 4
     [~, n, e] = fileparts(currentPath);
-    addHistoryRowTab4(fig, [n e], upper(strrep(e,'.','')), getFileSize(currentPath), '', gesture);
+    addHistoryRowSession(fig, [n e], upper(strrep(e,'.','')), getFileSize(currentPath), '', gesture);
     writeFullLog(fig, sprintf('Classificata immagine "%s" → %s', [n e], char(gesture)));
     setSessionStatus(fig, 'Classificazione immagine', true, []);
 end
