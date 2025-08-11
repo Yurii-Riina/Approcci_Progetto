@@ -1,13 +1,32 @@
-% ==============================================
-% Chiude la UI corrente del modulo e ritorna alla schermata principale del progetto.
-% Al momento richiama direttamente la funzione createApp, ma in futuro potrebbe
-% essere adattata per un comportamento più fluido o animato.
-% ==============================================
-
 function backToMain(currentFig)
-    % Chiude la finestra attuale
+% BACKTOMAIN  Chiude il modulo corrente e ritorna alla schermata principale.
+%
+% Sintassi:
+%   backToMain(currentFig)
+%
+% Input:
+%   currentFig : handle alla figura/UI corrente da chiudere
+%
+% Descrizione:
+%   - Chiude la finestra del modulo attualmente aperto
+%   - Richiama la funzione principale `createApp` per mostrare la
+%     schermata iniziale del progetto
+%
+% Note:
+%   - `createApp` deve trovarsi nel MATLAB path, altrimenti verrà generato un errore.
+%   - In futuro, questa funzione può essere estesa per:
+%       • Aggiungere transizioni animate
+%       • Salvare automaticamente lo stato della sessione
+%       • Mostrare conferme prima di abbandonare il modulo
+%
+% Esempio:
+%   backToMain(gcf);   % Chiude la finestra attuale e riapre la home
+%
+% Vedi anche: createApp, delete
+
+    % --- Chiude la finestra del modulo corrente ---
     delete(currentFig); 
 
-    % Richiama l'app principale (createApp deve trovarsi nel path)
-    createApp();         
+    % --- Avvia la schermata principale ---
+    createApp();
 end
