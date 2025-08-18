@@ -17,12 +17,16 @@ function onAddToHistory(fig)
     support = sum(C,2);
     TP      = diag(C);
     denom   = sum(C(:));
-    if denom>0, accG = sum(diag(C))/denom; else, accG = NaN; end
-    acc_i   = nan(size(C,1),1); nz = support>0; acc_i(nz) = TP(nz)./support(nz);
+    accG    = iff(denom>0, sum(diag(C))/denom, NaN);
+    acc_i   = nan(size(C,1),1);
+    nz      = support>0; 
+    acc_i(nz) = TP(nz)./support(nz);
 
     % --- nome/metadata sorgente (se non presente, fallback con timestamp)
     srcName = getappdata(fig,'CurrentSourceName');   % se onChooseDemo/onLoadConfMat lo hanno settato
-    if isempty(srcName), srcName = 'confmat'; end
+    if isempty(srcName)
+        srcName = 'confmat';
+    end
     stamp = char(datetime('now','Format','dd-MM-yyyy HH:mm:ss'));
 
     entry = struct( ...
@@ -39,10 +43,14 @@ function onAddToHistory(fig)
 
     % --- append ad HistoryP2
     H = getappdata(fig,'HistoryP2');
-    if isempty(H), H = entry; else, H(end+1) = entry; end
+    if isempty(H)
+        H = entry;
+    else
+        H(end+1) = entry;
+    end
     setappdata(fig,'HistoryP2', H);
 
-    % --- aggiorna Tab4 (tabella storico)
+    % --- aggiorna Tab5 (tabella storico)
     try
         hTbl = findobj(fig,'Tag','HistoryTableP2');
         if ~isempty(hTbl) && isvalid(hTbl)
@@ -60,20 +68,11 @@ function onAddToHistory(fig)
         logP2(fig, sprintf('[P2] Update HistoryTableP2 errore: %s', ME.message));
     end
 
-    % --- aggiorna dropdown confronto in Tab3
+    % --- aggiorna dropdown Tab3/Tab4 in un colpo
     try
-        dd = findobj(fig,'Tag','CompareDropdown');
-        if ~isempty(dd) && isvalid(dd)
-            labelItem = sprintf('%s | %s | acc %.1f%%', srcName, stamp, 100*accG);
-            items = string(dd.Items);
-            if items == "-- seleziona da storico --"
-                dd.Items = {labelItem};
-            else
-                dd.Items = cellstr([items; string(labelItem)]);
-            end
-        end
+        refreshP2History(fig);
     catch ME
-        logP2(fig, sprintf('[P2] Update CompareDropdown errore: %s', ME.message));
+        logP2(fig, sprintf('[P2] refreshP2History errore: %s', ME.message));
     end
 
     logP2(fig, sprintf('[P2] Aggiunto allo storico: %s (%s).', srcName, stamp));

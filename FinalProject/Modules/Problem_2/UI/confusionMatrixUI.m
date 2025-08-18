@@ -154,7 +154,15 @@ function confusionMatrixUI()
         'Value',{'Log breve operazioni P2.'});
     
     %% ====== TAB 3 – Metriche & Confronto ======
-    tabMetrics = uitab(tg,'Title','📈 Metriche & Confronto');
+    tabMetrics = uitab(tg,'Title','📈 Metriche');
+
+    % Dropdown storico (default: ultimo)
+    uidropdown(tabMetrics, ...
+        'Items',{'-- storico vuoto --'}, ...
+        'Position',[20 510 440 30], ...
+        'Tag','MetricsHistoryDropdown', ...
+        'Tooltip','Scegli una voce dallo storico per visualizzarne le metriche', ...
+        'ValueChangedFcn',@(~,~) onSelectMetricsFromHistory(fig));
     
     % Badge accuratezza globale
     uilabel(tabMetrics,'Text','Accuratezza Globale:', ...
@@ -163,39 +171,78 @@ function confusionMatrixUI()
         'Position',[240 470 200 32],'FontSize',20,'FontWeight','bold','FontColor',[0 0.5 0]);
     
     % Tabella per-classe
-    uitable(tabMetrics,'Position',[20 210 560 250],'Tag',T.TablePerClass, ...
-        'ColumnName',{'Classe','TP','Totale','Acc %'},'RowName',[]);
+    tbl = uitable(tabMetrics,'Position',[20 210 560 250],'Tag',T.TablePerClass, ...
+        'ColumnName',{'Classe','True Positives','Totale','Accuratezza %'}, ...
+        'ColumnEditable',[false false false false], ...
+        'RowName',[]);
     try
         tbl.ColumnFormat = {'char','numeric','numeric','numeric'};
+
+        % centra tutte le colonne (se disponibile)
+        sCenter = uistyle('HorizontalAlignment','center');
+        addStyle(tbl,sCenter,'column',1:4);
     catch
     end
     
-    % === NUOVO: Grafico a barre delle accuratezze per classe (a destra) ===
+    % Grafico a barre (Acc per classe)
     axBar = uiaxes(tabMetrics,'Position',[600 210 560 250],'Tag',T.BarAxes);
+    setappdata(fig,'BarAxesHandle', axBar);  
+
     axBar.Toolbar.Visible = 'off'; box(axBar,'on');
     title(axBar,'Accuratezza per classe (%)');
     xlabel(axBar,'Classe'); ylabel(axBar,'Acc %');
-    try
+    try 
         axBar.XTickLabelRotation = 25; 
-    catch
+    catch 
     end
     
-    % Confronto
-    uidropdown(tabMetrics,'Items',{'-- seleziona da storico --'}, ...
-        'Position',[20 160 400 30],'Tag',T.CompareDropdown);
+    % Pannello note/suggerimenti (testo dinamico)
+    uitextarea(tabMetrics,'Position',[20 40 1140 150], ...
+        'Editable','off','Tag','MetricsNotesBox', ...
+        'Value',{'Suggerimenti e osservazioni verranno mostrati qui.'});
     
-    uibutton(tabMetrics,'Text',BTN.Compare,'Position',[440 160 140 30], ...
-        'Tooltip','Mostra due heatmap affiancate','ButtonPushedFcn', ...
-        @(~,~) callOrTodo('onCompare',fig));
+    % popolamento iniziale dropdown tab3 (se c’è storico)
+    refreshP2History(fig);     % (funzione helper)
+
+    %% ====== TAB 4 – Confronto ======
+    tabCompare = uitab(tg,'Title','🆚 Confronto');
     
-    % DOPO (metti queste)
-    axL = uiaxes(tabMetrics,'Position',[20 20 560 120],'Tag',T.CompareAxesLeft);
+    uilabel(tabCompare,'Text','Sinistra = matrice corrente o scelta A   |   Destra = scelta B dallo storico', ...
+        'Position',[20 510 820 22]);
+
+    % Dropdown A/B
+    uidropdown(tabCompare, ...
+        'Items',{'-- storico vuoto --'}, ...
+        'Position',[20 475 500 28], ...
+        'Tag','CompareDropLeft', ...
+        'Tooltip','Scelta A (sinistra): se lasci vuoto usa la matrice corrente');
+    uidropdown(tabCompare, ...
+        'Items',{'-- storico vuoto --'}, ...
+        'Position',[660 475 500 28], ...
+        'Tag','CompareDropRight', ...
+        'Tooltip','Scelta B (destra): elemento dallo storico');  
+
+    % Bottone Confronta
+    uibutton(tabCompare,'Text','🆚 Confronta','Position',[540 474 100 30], ...
+        'ButtonPushedFcn',@(~,~) onCompare(fig));
+    
+    % Heatmap affiancate (più compatte per lasciare spazio al riepilogo)
+    axL = uiaxes(tabCompare,'Position',[20 232 560 220],'Tag',T.CompareAxesLeft);
     axL.Toolbar.Visible = 'off'; axis(axL,'tight'); box(axL,'on');
-    
-    axR = uiaxes(tabMetrics,'Position',[600 20 560 120],'Tag',T.CompareAxesRight);
+
+    axR = uiaxes(tabCompare,'Position',[600 232 560 220],'Tag',T.CompareAxesRight);
     axR.Toolbar.Visible = 'off'; axis(axR,'tight'); box(axR,'on');
+
+    % Riepilogo numerico confronto
+    uitextarea(tabCompare, ...
+        'Position',[20 40 1140 170], ...
+        'Editable','off','Tag','CompareSummaryBox', ...
+        'Value',{'Riepilogo confronto (globale e per classe) aparecerà qui.'});
     
-    %% ====== TAB 4 – Sessione (storico, stato, export) ======
+    % popolamento iniziale dropdown tab4 (se c’è storico)
+    refreshP2History(fig);   
+    
+    %% ====== TAB 5 – Sessione (storico, stato, export) ======
     tabSession = uitab(tg,'Title','🗃️ Sessione');
     
     % Storico P2
@@ -248,7 +295,7 @@ function confusionMatrixUI()
         end
     end
     
-    %% ====== TAB 5 – Guida (FAQ) ======
+    %% ====== TAB 6 – Guida (FAQ) ======
     tabHelp = uitab(tg,'Title','❓ Guida');
     
     uilabel(tabHelp,'Text','Domande frequenti (FAQ)', ...
