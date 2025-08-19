@@ -75,7 +75,7 @@ function onAddToHistory(fig)
         logP2(fig, sprintf('[P2] refreshP2History errore: %s', ME.message));
     end
 
-    logP2(fig, sprintf('[P2] Aggiunto allo storico: %s (%s).', srcName, stamp));
+    logP2(fig, sprintf('[P2] Aggiunto allo storico: %s.', srcName));
 end
 
 function o = iff(cond, a, b)

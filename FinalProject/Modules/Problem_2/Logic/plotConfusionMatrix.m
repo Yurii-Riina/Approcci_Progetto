@@ -21,7 +21,9 @@ function plotConfusionMatrix(ax, C, labels, opts)
     end
 
     % === Plot heatmap ===
-    cla(ax,'reset');  
+    %cla(ax,'reset'); 
+    cla(ax);                 % cancella solo i figli, NON resetta le proprietà
+
     ax.CLimMode = 'auto';
     ax.Toolbar.Visible = 'off';  
     box(ax,'on');    

@@ -196,10 +196,22 @@ function confusionMatrixUI()
     catch 
     end
     
-    % Pannello note/suggerimenti (testo dinamico)
-    uitextarea(tabMetrics,'Position',[20 40 1140 150], ...
-        'Editable','off','Tag','MetricsNotesBox', ...
-        'Value',{'Suggerimenti e osservazioni verranno mostrati qui.'});
+    % ===== Mini-report (card) al posto della textarea =====
+    rpt = uipanel(tabMetrics,'Position',[20 40 1140 150], ...
+        'Title','Report metriche','BackgroundColor',[1 1 1], ...
+        'FontName','Segoe UI','FontSize',12,'Tag','MetricsReportPanel');
+
+    uilabel(rpt,'Text','Accuratezza globale: –','Tag','RptGlobal', ...
+        'Position',[12 92 1110 24],'FontSize',14,'FontWeight','bold');
+
+    uilabel(rpt,'Text','Migliore: –','Tag','RptBest', ...
+        'Position',[12 66 1110 22],'FontSize',13);
+
+    uilabel(rpt,'Text','Peggiore: –','Tag','RptWorst', ...
+        'Position',[12 42 1110 22],'FontSize',13);
+
+    uilabel(rpt,'Text','Suggerimento: —','Tag','RptTip', ...
+        'Position',[12 16 1110 22],'FontSize',12);
     
     % popolamento iniziale dropdown tab3 (se c’è storico)
     refreshP2History(fig);     % (funzione helper)
