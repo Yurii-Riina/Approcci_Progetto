@@ -15,7 +15,7 @@ function createApp()
 %   SharedUtils/simulatePress.m             – placeholder “press” per moduli non attivi
 %   SharedUtils/openPDF.m                   – apertura sicura della relazione PDF
 %   Modules/Problem_1/UI/staticGestureRecognitionUI.m
-%   Modules/Problem_1/UI/launchProblem1.m   – helper che chiude fig corrente e apre il Modulo 1
+%   Modules/Problem_1/UI/launchProblem.m   – helper che chiude fig corrente e apre il Modulo 1
 %
 % Note
 %   - La UI usa posizionamento assoluto (pixel). Se in futuro rendi la finestra
@@ -154,14 +154,21 @@ function createApp()
         card.BackgroundColor = bg1;
 
         % Callback logica: apre Modulo 1, oppure placeholder
-        if i == 1
-            logicalCb = @(src,evt) launchProblem1(fig);
-            btnText   = '▶ Visualizza modulo';
-            tip       = 'Apri il modulo attivo';
-        else
-            logicalCb = @(src,evt) simulatePress(src);
-            btnText   = '🔒 Modulo non attivo';
-            tip       = 'Modulo non ancora disponibile';
+        switch i
+            case 1
+                
+                btnText   = '▶ Visualizza modulo';
+                tip       = 'Apri il modulo attivo';
+                logicalCb = @(~,~) launchModule(fig, 1, @staticGestureRecognitionUI, struct('Title','Modulo 1'));
+            case 2
+                
+                btnText   = '▶ Visualizza modulo';
+                tip       = 'Apri il modulo attivo';
+                logicalCb = @(~,~) launchModule(fig, 2, @confusionMatrixUI, struct('Title','Modulo 2'));
+            otherwise
+                logicalCb = @(src,evt) simulatePress(src);
+                btnText   = '🔒 Modulo non attivo';
+                tip       = 'Modulo non ancora disponibile';
         end
 
         % Bottone azione con effetto-pressione wrappato
